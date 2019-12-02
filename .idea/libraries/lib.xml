@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jline-3.12.2-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jsoup-1.12.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxen-1.1.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/progressbar.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/dom4j-2.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/dom4jExtension.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/selenium-server-standalone-3.141.59.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
