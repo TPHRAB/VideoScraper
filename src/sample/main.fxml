@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="stage" prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.MainController">
+  <children>
+    <MenuBar VBox.vgrow="NEVER">
+      <menus>
+            <Menu mnemonicParsing="false" text="Go to">
+              <items>
+                <MenuItem fx:id="gotoHomeMenu" mnemonicParsing="false" onAction="#gotoHomeMenuClicked" text="Home" />
+                  <MenuItem mnemonicParsing="false" text="Setting" />
+              </items>
+            </Menu>
+      </menus>
+    </MenuBar>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+      <children>
+        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="143.0" layoutY="25.0" prefHeight="40.0" prefWidth="354.0" style="&#10;" text="Video Scraper" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
+          <font>
+            <Font size="18.0" />
+          </font>
+        </Label>
+            <AnchorPane layoutX="14.0" layoutY="65.0" prefHeight="295.0" prefWidth="612.0" style="-fx-background-color: #E1E1E1;">
+               <children>
+                  <Pane fx:id="menuLabelHome" layoutX="58.0" layoutY="86.0" onMouseClicked="#menuLabelHomeClicked" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
+                     <children>
+                        <ImageView layoutX="43.0" layoutY="38.0">
+                           <image>
+                              <Image url="@icons8-menu-24.png" />
+                           </image>
+                        </ImageView>
+                        <Label layoutX="40.0" layoutY="76.0" text="Menu" />
+                     </children>
+                  </Pane>
+                  <Pane layoutX="251.0" layoutY="86.0" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
+                     <children>
+                        <Label layoutX="28.0" layoutY="76.0" text="Download" />
+                        <ImageView layoutX="40.0" layoutY="36.0">
+                           <image>
+                              <Image url="@icons8-download-32.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </Pane>
+                  <Pane layoutX="446.0" layoutY="86.0" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
+                     <children>
+                        <Label layoutX="34.0" layoutY="76.0" text="History" />
+                        <ImageView fitHeight="46.0" fitWidth="47.0" layoutX="31.0" layoutY="30.0">
+                           <image>
+                              <Image url="@icons8-activity-history-80.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </Pane>
+               </children>
+            </AnchorPane>
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>
