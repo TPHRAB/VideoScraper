@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modules>
+    <specified>
+
+    </specified>
+    <unspecified>
+        <bruteForceHtml>
+            <class>download2.BruteForceHtml</class>
+            <param>java.lang.String</param>
+        </bruteForceHtml>
+    </unspecified>
+</modules>

@@ -10,7 +10,12 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 import extensions.dom4j.Dom4jUtil;
 import extensions.progresbar.ProgressBar;
+import test.TrustSSL;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +23,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +40,26 @@ public class AutoDownload {
     public static final String DIRECTORY_SEPERATOR = System.getProperty("os.name").
     		toLowerCase().contains("win") ? "\\" : "/";
 
+    private static class DefaultTrustManager implements X509TrustManager {
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {}
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
-    	
-        // set up ssl
-        System.setProperty("javax.net.ssl.keyStore", "icekeystore.jks");
-        System.setProperty("javax.net.ssl.keyStorePassword", "123456");
-        System.setProperty("javax.net.ssl.trustStore", "icetruststore.jks");
-        System.setProperty("javax.net.ssl.trustStorePassword", "123456");
+
+        // configure the SSLContext with a TrustManager
+        SSLContext ctx = SSLContext.getInstance("TLS");
+        ctx.init(new KeyManager[0], new TrustManager[] {new DefaultTrustManager()}, new SecureRandom());
+        SSLContext.setDefault(ctx);
 
         org.dom4j.Document xml = Dom4jUtil.getDocument("websites.xml");
         
@@ -69,7 +90,7 @@ public class AutoDownload {
     		
     		WebDriver browser = new FirefoxDriver();
     		// set time interval to wait after loading a new page so that xpath could work fine
-    		browser.manage().timeouts().implicitlyWait(20,TimeUnit.SECONDS);
+    		browser.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     		browser.get(url);
     		// get video file
     		String link = null;
@@ -209,7 +230,7 @@ public class AutoDownload {
     
     public static void directMP4(String url, File out, Element host) throws Exception {
     	if (DIRECTORY_SEPERATOR.equals("/")) {
-    		System.setProperty("webdriver.gecko.driver", "./geckodriver");
+    		System.setProperty("webdriver.gecko.driver", "./geckodriver_linux");
     	} else {
     		System.setProperty("webdriver.gecko.driver", "./geckodriver.exe");
     	}
@@ -316,23 +337,24 @@ public class AutoDownload {
 	
 	public static void videoCombine(Scanner console, String url, File dir, Element host)
 			throws Exception {
-		System.out.print("Please input the path for combination: ");
+        System.out.print("Please input the path for combination: ");
         String path = console.nextLine();
         path = path + DIRECTORY_SEPERATOR + DownloadManager.getURLTitle(url) + ".ts";
         File result = new File(path);
         extensions.copy.TestThread.waitThreads(
                 extensions.copy.TestThread.doCombine(dir.listFiles(), result));
-        
+
         if (dir.getName().equals("raw")) {
-        	for (File f : dir.listFiles()) {
-        		f.delete();
-        	}
-        	dir.delete();
+            for (File f : dir.listFiles()) {
+                f.delete();
+            }
+            dir.delete();
         }
-        
+
         String convert = host.attributeValue("autoConvert");
         if (convert != null && convert.equals("true")) {
-        	if (videoConvert(path)) result.delete();
+            if (videoConvert(path)) result.delete();
         }
-	}
+    }
 }
+
