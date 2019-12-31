@@ -18,7 +18,7 @@
             <Menu mnemonicParsing="false" text="Go to">
               <items>
                 <MenuItem fx:id="gotoHomeMenu" mnemonicParsing="false" onAction="#gotoHomeMenuClicked" text="Home" />
-                  <MenuItem mnemonicParsing="false" text="Setting" />
+                  <MenuItem mnemonicParsing="false" text="History" />
               </items>
             </Menu>
       </menus>
@@ -39,7 +39,7 @@
                               <Image url="@icons8-menu-24.png" />
                            </image>
                         </ImageView>
-                        <Label layoutX="40.0" layoutY="76.0" text="Menu" />
+                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="29.0" layoutY="76.0" text="Methods" />
                      </children>
                   </Pane>
                   <Pane layoutX="251.0" layoutY="86.0" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
@@ -54,10 +54,10 @@
                   </Pane>
                   <Pane layoutX="446.0" layoutY="86.0" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
                      <children>
-                        <Label layoutX="34.0" layoutY="76.0" text="History" />
-                        <ImageView fitHeight="46.0" fitWidth="47.0" layoutX="31.0" layoutY="30.0">
+                        <Label layoutX="34.0" layoutY="76.0" text="Setting" />
+                        <ImageView fitHeight="40.0" fitWidth="41.0" layoutX="34.0" layoutY="35.0">
                            <image>
-                              <Image url="@icons8-activity-history-80.png" />
+                              <Image url="@icons8-gear-96.png" />
                            </image>
                         </ImageView>
                      </children>

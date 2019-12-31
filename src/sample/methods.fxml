@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="stage" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.MenuController">
+<VBox fx:id="stage" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.MethodsController">
 <children>
     <MenuBar VBox.vgrow="NEVER">
         <menus>
@@ -18,7 +19,10 @@
             </Menu>
         </menus>
     </MenuBar>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
-    </AnchorPane>
+    <AnchorPane fx:id="informationPanel" maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+         <children>
+            <ListView fx:id="methodsList" prefHeight="375.0" prefWidth="176.0" />
+            <AnchorPane fx:id="emptyInformationPane" layoutX="176.0" prefHeight="375.0" prefWidth="478.0" style="-fx-background-color: #F0FFFF;" />
+         </children></AnchorPane>
 </children>
 </VBox>

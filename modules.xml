@@ -4,9 +4,6 @@
 
     </specified>
     <unspecified>
-        <bruteForceHtml>
-            <class>download2.BruteForceHtml</class>
-            <param>java.lang.String</param>
-        </bruteForceHtml>
+        <bruteForceHtml></bruteForceHtml>
     </unspecified>
 </modules>

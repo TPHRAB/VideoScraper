@@ -22,7 +22,7 @@ public class MainController {
 
     @FXML
     void menuLabelHomeClicked(MouseEvent event) throws Exception {
-        loadScene("menu.fxml");
+        loadScene("methods.fxml");
     }
 
     @FXML
