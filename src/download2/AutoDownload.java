@@ -32,23 +32,23 @@ public class AutoDownload {
         System.out.print("Please input the url: ");
         String url = sc.nextLine();
 
-        // get xml
-        Document xml = Dom4jUtil.getDocument("modules.xml");
-        Element method = (Element) xml.selectSingleNode("/modules/specified/" + url.substring(0, url.lastIndexOf("/")));
-        if (method != null) {
-            Class moduleClass = Class.forName(method.getTextTrim());
-            DownloadModule module = (DownloadModule) moduleClass.newInstance();
-            module.startDownload();
-        } else {
-            Element unspecified = (Element) xml.selectSingleNode("/modules/unspecified");
-            for (Element m : unspecified.elements()) {
-                Class moduleClass = Class.forName(m.selectSingleNode("./class").getText());
-                DownloadModule module = (DownloadModule) moduleClass.getConstructor().newInstance();
-                if (module.startDownload()) {
-                    break;
-                }
-            }
-        }
+//        // get xml
+//        Document xml = Dom4jUtil.getDocument("modules.xml");
+//        Element method = (Element) xml.selectSingleNode("/modules/specified/" + url.substring(0, url.lastIndexOf("/")));
+//        if (method != null) {
+//            Class moduleClass = Class.forName(method.getTextTrim());
+//            DownloadModule module = (DownloadModule) moduleClass.newInstance();
+//            module.();
+//        } else {
+//            Element unspecified = (Element) xml.selectSingleNode("/modules/unspecified");
+//            for (Element m : unspecified.elements()) {
+//                Class moduleClass = Class.forName(m.selectSingleNode("./class").getText());
+//                DownloadModule module = (DownloadModule) moduleClass.getConstructor().newInstance();
+//                if (module.startDownload()) {
+//                    break;
+//                }
+//            }
+//        }
     }
 
 

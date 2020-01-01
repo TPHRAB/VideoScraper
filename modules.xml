@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modules>
-    <specified>
-
-    </specified>
-    <unspecified>
-        <bruteForceHtml></bruteForceHtml>
-    </unspecified>
+    <bruteForceHtml>/modules/BruteForceHTML/BruteForceHTML.fxml</bruteForceHtml>
 </modules>

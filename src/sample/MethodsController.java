@@ -1,6 +1,5 @@
 package sample;
 
-import download2.DownloadModule;
 import extensions.dom4j.Dom4jUtil;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -14,18 +13,22 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import org.dom4j.Document;
+import org.dom4j.Element;
+import org.openqa.selenium.json.JsonOutput;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MethodsController {
     @FXML
     private VBox stage;
+
     @FXML
     private MenuItem gotoHomeMenu;
 
@@ -33,14 +36,15 @@ public class MethodsController {
     private ListView<String> methodsList;
 
     @FXML
-    private AnchorPane informationPanel;
+    private ScrollPane informationPane;
+
+    private Map<String, String> modules;
 
     /**
      * initialize the class after loading methods.fxml
      */
     @FXML
     private void initialize() {
-        Document xml = Dom4jUtil.getDocument("modules.xml");
         // set cell look
         methodsList.setCellFactory(new Callback<ListView<String>,
                                             ListCell<String>>() {
@@ -57,10 +61,33 @@ public class MethodsController {
                     public void changed(ObservableValue<? extends String> observableValue, String s, String t1) {
                         System.out.println(1);
                     }
-                });
-        ObservableList<String> items = FXCollections.observableArrayList (
-                "Single", "Double", "Suite", "Family App");
+                }
+        );
+
+        // initialize modules menu
+        Element modulesList = Dom4jUtil.getDocument("modules.xml").getRootElement();
+        modules = new HashMap<>();
+        for (Element module : modulesList.elements()) {
+            modules.put(module.getName(), module.getTextTrim());
+        }
+        ObservableList<String> items = FXCollections.observableArrayList(modules.keySet());
         methodsList.setItems(items);
+
+        // change information pane when a item in the module menu is selected
+        methodsList.getSelectionModel().selectedItemProperty().addListener(
+                new ChangeListener<String>() {
+                    public void changed(ObservableValue<? extends String> ov,
+                                        String old_val, String new_val) {
+                        try {
+                            Parent root = FXMLLoader.load(getClass().getResource(modules.get(new_val)));
+                            informationPane.setContent(root);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println(new_val);
+                    }
+                }
+        );
     }
 
     /**
