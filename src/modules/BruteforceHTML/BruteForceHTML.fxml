@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-
-<GridPane alignment="center" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="modules.BruteforceHTML.BruteForceHTML">
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="modules.BruteforceHTML.BruteForceHTML">
     <columnConstraints>
         <ColumnConstraints />
         <ColumnConstraints />
@@ -21,11 +22,33 @@
     <children>
         <AnchorPane prefHeight="375.0" prefWidth="464.0">
             <children>
-                <Label layoutX="14.0" layoutY="23.0" prefHeight="34.0" prefWidth="137.0" text="BruteFoceHtml">
+                <Label layoutX="15.0" layoutY="40.0" prefHeight="34.0" prefWidth="199.0" text="BruteFoceHtml">
                     <font>
-                        <Font size="14.0" />
+                        <Font name="Times New Roman Bold" size="27.0" />
                     </font>
                 </Label>
+            <TextField fx:id="urlTextField" layoutX="135.0" layoutY="108.0" prefHeight="23.0" prefWidth="295.0" promptText="Please input the video's url..." />
+            <Label layoutX="38.0" layoutY="108.0" prefHeight="23.0" prefWidth="77.0" text="URL:">
+               <font>
+                  <Font name="Times New Roman" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="38.0" layoutY="174.0" text="Download to:">
+               <font>
+                  <Font name="Times New Roman" size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="downloadPathTextField" layoutX="135.0" layoutY="171.0" prefHeight="23.0" prefWidth="221.0" />
+            <Button fx:id="browseButton" layoutX="369.0" layoutY="169.0" mnemonicParsing="false" text="browse">
+               <font>
+                  <Font name="Times New Roman" size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="startButton" layoutX="198.0" layoutY="242.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="95.0" text="Start">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
             </children>
         </AnchorPane>
     </children>
