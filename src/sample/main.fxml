@@ -32,7 +32,7 @@
         </Label>
             <AnchorPane layoutX="14.0" layoutY="65.0" prefHeight="295.0" prefWidth="612.0" style="-fx-background-color: #E1E1E1;">
                <children>
-                  <Pane fx:id="menuLabelHome" layoutX="58.0" layoutY="86.0" onMouseClicked="#menuLabelHomeClicked" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
+                  <Pane fx:id="methodsLabelHome" layoutX="58.0" layoutY="86.0" onMouseClicked="#methodsLabelHomeClicked" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
                      <children>
                         <ImageView layoutX="43.0" layoutY="38.0">
                            <image>
@@ -42,9 +42,9 @@
                         <Label alignment="CENTER" contentDisplay="CENTER" layoutX="29.0" layoutY="76.0" text="Methods" />
                      </children>
                   </Pane>
-                  <Pane layoutX="251.0" layoutY="86.0" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
+                  <Pane layoutX="251.0" layoutY="86.0" onMouseClicked="#downloadsLabelHomeClicked" prefHeight="123.0" prefWidth="110.0" style="-fx-background-color: A1A1A1;">
                      <children>
-                        <Label layoutX="28.0" layoutY="76.0" text="Download" />
+                        <Label layoutX="28.0" layoutY="76.0" text="Downloads" />
                         <ImageView layoutX="40.0" layoutY="36.0">
                            <image>
                               <Image url="@../Images/icons8-download-32.png" />

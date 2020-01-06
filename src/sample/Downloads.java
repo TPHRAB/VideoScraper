@@ -5,30 +5,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
-public class MainController {
-
+public class Downloads {
     @FXML
     private VBox stage;
-
-    @FXML
-    private Pane menuLabelHome;
-
-    @FXML
-    void methodsLabelHomeClicked(MouseEvent event) throws Exception {
-        loadScene("methods.fxml");
-    }
-
-    @FXML
-    void downloadsLabelHomeClicked(MouseEvent event) throws Exception {
-        loadScene("downloads.fxml");
-    }
 
     @FXML
     void gotoHomeMenuClicked(ActionEvent event) throws Exception {
