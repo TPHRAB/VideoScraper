@@ -8,7 +8,7 @@
 // to read or write a file from any starting position.
 
 
-package extensions.copy;
+package copy;
 
 import java.io.File;
 import java.io.IOException;

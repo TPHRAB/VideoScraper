@@ -4,11 +4,10 @@
 
 // "DownloadThread" class serves to be "Thread" to download files while also sending current progress to pipe
 
-package extensions.download;
+package download;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PipedWriter;
 import java.io.RandomAccessFile;

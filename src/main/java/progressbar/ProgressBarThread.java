@@ -4,7 +4,7 @@
 
 // "ProgressBarThread" class serves to be a thread to to show command line progressbar
 
-package extensions.progresbar;
+package progressbar;
 
 import java.io.PipedReader;
 

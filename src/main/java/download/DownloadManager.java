@@ -4,21 +4,20 @@
 
 // "DownloadManager" class supplies static methods for downloading files
 
-package extensions.download;
+package download;
 
+import controller.AutoDownload;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.seleniumhq.jetty9.server.session.FileSessionDataStore;
 
-import extensions.progresbar.ProgressBar;
+import progressbar.ProgressBar;
 
-import static extensions.progresbar.ProgressBarThread.getBold;
+import static progressbar.ProgressBarThread.getBold;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PipedWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;

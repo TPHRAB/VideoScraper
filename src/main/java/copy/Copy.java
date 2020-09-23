@@ -5,7 +5,7 @@
 // "Copy" is a class that serves to manipulate CopyThread class by creating multiple Copy threads 
 // to improve efficiency.
 
-package extensions.copy;
+package copy;
 
 import java.io.File;
 import java.io.IOException;

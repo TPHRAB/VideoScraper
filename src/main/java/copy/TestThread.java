@@ -7,7 +7,7 @@
 // Class TestThread is the main class for calling CopyThread and Copy. It use Multiple threads 
 // to copy or combine files
 
-package extensions.copy;
+package copy;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,7 +119,7 @@ public class TestThread {
 		out.createNewFile();
 		long totalSize = 0;
 		List<Copy> threads = new ArrayList<Copy>();
-		list = extensions.file.FileUtils.mergeSortOnFilesNames(list);
+		list = file.FileUtils.mergeSortOnFilesNames(list);
 		int i = 0;
 		int count = 0;
 		while (i < list.length) {

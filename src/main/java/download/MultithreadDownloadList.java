@@ -4,7 +4,7 @@
 
 // "MultithreadDownloadList" class serves to be a thread class to for downloading list of url
 
-package extensions.download;
+package download;
 
 import java.io.File;
 import java.io.PipedWriter;

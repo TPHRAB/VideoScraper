@@ -4,7 +4,7 @@
 
 // "Download" class serves to create and allocate the downloading task to "DownloadThread"
 
-package extensions.download;
+package download;
 
 import java.util.ArrayList;
 import java.util.List;

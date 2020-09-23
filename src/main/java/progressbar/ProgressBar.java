@@ -5,7 +5,7 @@
 // "Progressbar" class can create "ProgressbarThread" can return the PipedWriter that is connected
 // with "ProgressBarThread"'s PipedReader for sending current progress
 
-package extensions.progresbar;
+package progressbar;
 
 import java.io.IOException;
 import java.io.PipedReader;

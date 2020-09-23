@@ -4,7 +4,7 @@
 
 // "FileUtils" class provides static methods for handling files
 
-package extensions.file;
+package file;
 
 import java.io.File;
 import java.util.Arrays;

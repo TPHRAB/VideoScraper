@@ -1,16 +1,14 @@
-package extensions.download;
+package controller;
 
+import download.DownloadManager;
 import org.dom4j.Element;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import extensions.dom4j.Dom4jUtil;
-import extensions.progresbar.ProgressBar;
-import test.TrustSSL;
+import progressbar.ProgressBar;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -28,7 +26,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
@@ -62,7 +59,7 @@ public class AutoDownload {
         SSLContext.setDefault(ctx);
 
         org.dom4j.Document xml = Dom4jUtil.getDocument("websites.xml");
-        
+
         // get url and output path
         Scanner console = new Scanner(System.in);
         System.out.print("Please input the video url: ");
@@ -71,23 +68,21 @@ public class AutoDownload {
         String outputDirectory = console.nextLine();
         if (outputDirectory.trim().isEmpty()) {
         	String xpath = "/config/defaultPath[@seperator='" + DIRECTORY_SEPERATOR + "']";
+            System.out.println(xpath);
         	outputDirectory = xml.selectSingleNode(xpath).getText();
         }
         File out = new File(outputDirectory);
-        
+
         String xpath = "/config/methods/host[@id='" + new URL(url).getHost() + "']";
         Element host = (Element) xml.selectSingleNode(xpath);
 
-        // 瑕佸緱鍒扮埗鑺傜偣鍒ゆ柇鏄摢涓柟娉�
-        if(host.attributeValue("method").equals("m3u8Append")) {
-            m3u8Appended(url, out, host);
-            videoCombine(console, url, out, host);
-        } else if (host.attributeValue("method").equals("directMP4")) {
+        if (host.attributeValue("method").equals("directMP4")) {
         	directMP4(url, out, host);
         } else if (host.attributeValue("method").equals("seleniumMP4")) {
+        	// be ready for ssl
     		System.setProperty("javax.net.ssl.keyStorePassword", "123456");
     		System.setProperty("webdriver.gecko.driver", "./geckodriver.exe");
-    		
+
     		WebDriver browser = new FirefoxDriver();
     		// set time interval to wait after loading a new page so that xpath could work fine
     		browser.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
@@ -111,39 +106,6 @@ public class AutoDownload {
     		DownloadManager.doDownloadSingleFile(new URL(link), result, 10, pb.getPipedWriter(),
     				new HashMap<String, String>());
     		pb.join();
-        } else if (host.attributeValue("method").equals("m3u8Custom")) {  		
-        	Map<String, String> requestProperties = new HashMap<>();
-        	requestProperties.put("Accept", "text/html,application/xhtml+xml,application/xml;"
-        			+ "q=0.9,*/*;q=0.8");
-    		requestProperties.put("Accept-Encoding", "utf-8");
-    		requestProperties.put("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;"
-    				+ "q=0.5,en-US;q=0.3,en;q=0.2");
-    		requestProperties.put("Connection", "keep-alive");
-    		requestProperties.put("Upgrade-Insecure-Request", "1");
-    		requestProperties.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64;"
-    				+ " rv:68.0) Gecko/20100101 Firefox/68");
-    		
-    		System.out.print("Please input the m3u8 link: ");
-            URL m3u8 = new URL(console.nextLine());
-            File m3u8File = new File("./" + DownloadManager.getURLFileName(m3u8));
-    		requestProperties.put("Host", m3u8.getHost());
-    		if (m3u8.toString().contains("qooqlevideo.com")) {
-    			requestProperties.put("Referer", url);
-    		}
-    		ProgressBar pb = new ProgressBar("Download", 1, "File", 1, "1");
-    		pb.start();
-    		DownloadManager.doDownloadSingleFile(m3u8, m3u8File, 1, pb.getPipedWriter(),
-    				requestProperties);
-    		pb.join();
-    		if (m3u8.toString().contains("ahcdn.com")) {
-    			requestProperties.put("Origin", "https://avgle.com");
-    			requestProperties.put("TE", "Trailers");
-    		}
-            DownloadManager.downloadTSFileList(getAppendedList(m3u8.toString(), m3u8File,
-            		null), out, 10, requestProperties);
-            videoCombine(console, url, out, host);
-        } else if (host.attributeValue("method").equals("directMP4")) {
-        	directMP4(url, out, host);
         } else {
         	System.out.println("Not supported website!");
         }
@@ -166,59 +128,53 @@ public class AutoDownload {
             r.close();
         }
         console.close();
-        
+
         for (File f : new File(".").listFiles()) {
         	String regex = ".*\\.m3u8";
         	if (f.getName().matches(regex)) {
         		f.delete();
         	}
         }
-        
+
         System.out.println("Finish...");
     }
 
-    public static void m3u8Appended(String l, File dir, Element host) throws Exception {
-        Document doc = Jsoup.connect(l).get();
+	/**
+	 * Get a list of links after combining links in m3u8 file with the domain name. The list starts at line of link that
+	 * equals to "from"
+	 * @param firstPart - the first part of the url before links in the m3u8 file
+	 * @param m3u8 - m3u8 file
+	 * @param from - from which line
+	 * @return a list of links of video segments
+	 * @throws Exception
+	 */
+	public static List<String> getAppendedList(String firstPart, File m3u8, String from)
+			throws Exception {
+		if (m3u8.getName().length() > 255) {
+			m3u8 = new File(m3u8.getName().substring(0, 255));
+		}
+		Scanner read = new Scanner(m3u8);
+		List<String> list = new ArrayList<String>();
+		boolean startCombine = (from == null); // combination process starts at the first line of the m3u8 file
 
-        // read selected "host" in xml to get the first m3u8 file
-        String link = doc.getElementsByTag(host.element("tag").getTextTrim())
-                .get(Integer.parseInt(host.element("index").getTextTrim()))
-                .attributes()
-                .get(host.element("attribute").getTextTrim());
-        if (host.attributeValue("addProtocal").equals("true")) {
-        	link = l.substring(0, l.indexOf('/')) + link;
-        }
-        link = link.substring(link.lastIndexOf("http"));
-        URL url = new URL(link);
-        File out = new File("./" + DownloadManager.getURLFileName(url));
-        ProgressBar pb = new ProgressBar("Download", 1, "Threads",
-                1, "1");
-        pb.start();
-        DownloadManager.doDownloadSingleFile(url, out, 1, pb.getPipedWriter(), null);
-        pb.join();
+		while (read.hasNextLine()) {
+			String line = read.nextLine();
+			if (line.equals(from)) { // starts the combination process
+				startCombine = true;
+			}
+			if (startCombine && line.charAt(0) != '#') {
+				if (line.indexOf("http") == -1) {
+					list.add(firstPart + line);
+				} else {
+					list.add(line);
+				}
+			}
 
-        if (host.attributeValue("trace").equals("true")) {
-            // get second m3u8
-            Scanner read = new Scanner(out);
-            String file = null;
-            while (read.hasNextLine()) {
-                file = read.nextLine();
-            }
-            link = link.substring(0, link.lastIndexOf('/') + 1) + file;
-            url = new URL(link);
-            out = new File("./" + DownloadManager.getURLFileName(url));
-            pb = new ProgressBar("Download", 1, "Threads", 1, "1");
-            pb.start();
-            DownloadManager.doDownloadSingleFile(url, out, 1, pb.getPipedWriter(), null);
-            pb.join();
-            // set "out" to be "out2"
-            read.close();
-        }
 
-        // download ts files
-        sololyM3u8(dir, getAppendedList(link, out, null));
-        
-    }
+		}
+		read.close();
+		return list;
+	}
 
     public static void sololyM3u8(File dir, List<String> list) throws Exception {
     	int threads = 10;
@@ -227,7 +183,7 @@ public class AutoDownload {
         }
         DownloadManager.downloadTSFileList(list, dir, 10, new HashMap<String, String>());
     }
-    
+
     public static void directMP4(String url, File out, Element host) throws Exception {
     	if (DIRECTORY_SEPERATOR.equals("/")) {
     		System.setProperty("webdriver.gecko.driver", "./geckodriver_linux");
@@ -246,48 +202,19 @@ public class AutoDownload {
         int threads = 10;
         long fileLength = DownloadManager.getURLFileLength(new URL(link), null);
         if (fileLength % 10 > 0) threads++;
-        ProgressBar pb = new ProgressBar("Download single file", threads, "Size", 1, 
+        ProgressBar pb = new ProgressBar("Download single file", threads, "Size", 1,
         		String.valueOf(fileLength));
         pb.start();
         DownloadManager.doDownloadSingleFile(new URL(link), result, 10, pb.getPipedWriter(), null);
         pb.join();
     }
-    
-    public static List<String> getAppendedList(String link, File m3u8, String from)
-    		throws Exception {
-    	if (m3u8.getName().length() > 255) {
-    		m3u8 = new File(m3u8.getName().substring(0, 255));
-    	}
-        Scanner read = new Scanner(m3u8);
-        List<String> list = new ArrayList<String>();
-        boolean startCombine = (from == null);
 
-        while (read.hasNextLine()) {
-            String line = read.nextLine();
-            if (line.equals(from)) {
-                startCombine = true;
-            }
-            if (startCombine && line.charAt(0) != '#') {
-                if (line.indexOf("http") == -1) {
-                    list.add(link.substring(0, link.lastIndexOf('/') + 1) + line);
-                } else {
-                    list.add(line);
-                }
-            }
-
-
-        }
-        read.close();
-        return list;
-    }
-    
     public static boolean videoConvert(String path) throws Exception {
-        
             List<String> command = new ArrayList<>();
             boolean execution = false;
             if (DIRECTORY_SEPERATOR.equals("\\")) {
             	command.add("cmd.exe");
-            	command.add("/c"); 
+            	command.add("/c");
             	command.add("start");
             	command.add("./ffmpeg.exe");
             	execution = true;
@@ -298,12 +225,12 @@ public class AutoDownload {
             	System.out.println("Not supported operating system! Please do the convertion"
             			+ " by yourself!");
             }
-            
+
             // set input file and output file
             command.add("-i");
             command.add(path);
             command.add(path.substring(0, path.length() - 2) + "mp4");
-            
+
             // run script
             if (execution) {
             	videoConvert(command);
@@ -312,9 +239,8 @@ public class AutoDownload {
             	return false;
             }
     }
-    
+
 	public static void videoConvert(List<String> command) throws IOException {
-		// 鎵ц鎿嶄綔
 		ProcessBuilder builder = new ProcessBuilder(command);
 		Process process = builder.start();
 		InputStream errorStream = process.getErrorStream();
@@ -334,15 +260,15 @@ public class AutoDownload {
 			errorStream.close();
 		}
 	}
-	
+
 	public static void videoCombine(Scanner console, String url, File dir, Element host)
 			throws Exception {
         System.out.print("Please input the path for combination: ");
         String path = console.nextLine();
         path = path + DIRECTORY_SEPERATOR + DownloadManager.getURLTitle(url) + ".ts";
         File result = new File(path);
-        extensions.copy.TestThread.waitThreads(
-                extensions.copy.TestThread.doCombine(dir.listFiles(), result));
+        copy.TestThread.waitThreads(
+                copy.TestThread.doCombine(dir.listFiles(), result));
 
         if (dir.getName().equals("raw")) {
             for (File f : dir.listFiles()) {
