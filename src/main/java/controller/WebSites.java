@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 public class WebSites {
     private static String YOUTUBE_SOURCE = "https://www.y2mate.com/en60";
     private static String BILIBILI_SOURCE = "https://keepv.id/download-bilibili-videos";
+    private static String TWITTER_SOURCE = "https://keepv.id/download-twitter-videos";
     WebDriver driver;
     WebDriverWait wait;
     String link; // video link on video hosting websties
@@ -41,8 +42,10 @@ public class WebSites {
     public WebSites(String link, String outputDirectory) {
         // initialize headless browser
         FirefoxOptions options = new FirefoxOptions();
-        options.setHeadless(true);
-//        options.addArguments("--silent");
+        options.addArguments("--headless", "");
+        // disable log
+        System.setProperty(FirefoxDriver.SystemProperty.DRIVER_USE_MARIONETTE,"true");
+        System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE,"/dev/null");
 
         driver = new FirefoxDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10).getSeconds());
@@ -81,23 +84,37 @@ public class WebSites {
     }
 
     /**
-     * Download bilibili videos
+     * Download videos from keevid
+     * @param format - format of the video to download
      * @throws Exception when download fails
      */
-    public void bilibili() throws Exception {
-        driver.get(BILIBILI_SOURCE);
+    private void keepvid(String format) throws Exception {
         driver.findElement(By.id("dlURL")).sendKeys(link); // fill in video link
         driver.findElement(By.id("dlBTN1")).click(); // click go
         driver.findElement(By.id("dlBTN1")).click(); // click go again
         String videoLink = waitElement(By.className("vdlbtn")).getAttribute("href");
         String outputFile = driver.findElement(By.cssSelector("h2.mb-3")).getText();
-        outputFile = replaceForbiddenChars(outputFile) + ".flv";
+        outputFile = replaceForbiddenChars(outputFile) + '.' + format;
         try {
             download(new URL(videoLink), outputFile);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Download failed");
         }
+    }
+
+    /**
+     * Download bilibili videos
+     * @throws Exception when download fails
+     */
+    public void bilibili() throws Exception {
+        driver.get(BILIBILI_SOURCE);
+        keepvid("flv");
+    }
+
+    public void twitter() throws Exception {
+        driver.get(TWITTER_SOURCE);
+        keepvid("mp4");
     }
 
     /**

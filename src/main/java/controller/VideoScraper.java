@@ -88,6 +88,8 @@ public class VideoScraper {
 			websites.youtube();
 	 	} else if (domainName.equals("www.bilibili.com")) {
        		websites.bilibili();
+		} else if (domainName.equals("twitter.com")) {
+       		websites.twitter();
 		}
 
 		// destruct
