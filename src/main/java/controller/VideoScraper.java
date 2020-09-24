@@ -82,14 +82,16 @@ public class VideoScraper {
         }
 
         // examine which method to use based on the website
-		WebSites websites = new WebSites(outputPath);
+		WebSites websites = new WebSites(url, outputPath);
         String domainName = new URL(url).getHost();
        	if (domainName.equals("www.youtube.com")) {
-			websites.youtube(url);
+			websites.youtube();
+	 	} else if (domainName.equals("www.bilibili.com")) {
+       		websites.bilibili();
 		}
 
 		// destruct
-//		websites.close();
+		websites.close();
         console.close();
         System.out.println("Finish...");
     }

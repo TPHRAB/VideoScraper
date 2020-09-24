@@ -9,6 +9,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 // utils
@@ -31,14 +32,21 @@ import java.util.regex.Pattern;
  */
 public class WebSites {
     private static String YOUTUBE_SOURCE = "https://www.y2mate.com/en60";
+    private static String BILIBILI_SOURCE = "https://keepv.id/download-bilibili-videos";
     WebDriver driver;
     WebDriverWait wait;
+    String link; // video link on video hosting websties
     String outputDirectory;
 
-    public WebSites(String outputDirectory) {
+    public WebSites(String link, String outputDirectory) {
         // initialize headless browser
-        driver = new FirefoxDriver();
+        FirefoxOptions options = new FirefoxOptions();
+        options.setHeadless(true);
+//        options.addArguments("--silent");
+
+        driver = new FirefoxDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10).getSeconds());
+        this.link = link;
         this.outputDirectory = outputDirectory;
     }
 
@@ -46,7 +54,11 @@ public class WebSites {
         return wait.until(driver -> driver.findElement(selector));
     }
 
-    public void youtube(String link) {
+    /**
+     * Download youtube videos
+     * @throws Exception when download fails
+     */
+    public void youtube() throws Exception {
         driver.get(YOUTUBE_SOURCE);
         driver.findElement(By.id("txt-url")).sendKeys(link); // fill in video link
         driver.findElement(By.id("btn-submit")).click(); // generate download link
@@ -57,22 +69,53 @@ public class WebSites {
 
         // name of the file to be generated
         String outputFile = waitElement(By.id("exampleModalLabel")).getText();
-        outputFile = outputFile.replaceAll("/", "\\\\"); // replace forbidden characters in naming
+        outputFile = replaceForbiddenChars(outputFile); // replace forbidden characters in naming
         outputFile += ".mp4";
 
         try {
-            download(new URL(videoLink), Paths.get(outputDirectory, outputFile).toString());
+            download(new URL(videoLink), outputFile);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new Exception("Download failed");
         }
+    }
+
+    /**
+     * Download bilibili videos
+     * @throws Exception when download fails
+     */
+    public void bilibili() throws Exception {
+        driver.get(BILIBILI_SOURCE);
+        driver.findElement(By.id("dlURL")).sendKeys(link); // fill in video link
+        driver.findElement(By.id("dlBTN1")).click(); // click go
+        driver.findElement(By.id("dlBTN1")).click(); // click go again
+        String videoLink = waitElement(By.className("vdlbtn")).getAttribute("href");
+        String outputFile = driver.findElement(By.cssSelector("h2.mb-3")).getText();
+        outputFile = replaceForbiddenChars(outputFile) + ".flv";
+        try {
+            download(new URL(videoLink), outputFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Download failed");
+        }
+    }
+
+    /**
+     * Replace forbidden characters in naming files
+     * @return A valid file name
+     */
+    private String replaceForbiddenChars(String name) {
+        return name.replaceAll("/", "\\\\");
     }
 
     /**
      * Download the file from link
      * @param video - video file to download
-     * @param outputPath - path of file to write in
+     * @param outputFile - file's name to generate
      */
-    private void download(URL video, String outputPath) throws IOException  {
+    private void download(URL video, String outputFile) throws IOException  {
+        String outputPath = Paths.get(outputDirectory, outputFile).toString();
+
         // get total bytes of the file to download
         URLConnection connection = video.openConnection();
         long fileSize = connection.getHeaderFieldLong("Content-Length", 0);
@@ -90,14 +133,31 @@ public class WebSites {
                                     .setTaskName("Downloading")
                                     .setStyle(ProgressBarStyle.ASCII)
                                     .build()) { // initialize progress bar
+            long initialZeroByteTime = -1;
             while (bytesTransferred < fileSize) { // when the inputChannel is not null
-                bytesTransferred += outputChannel.transferFrom(inputChannel, bytesTransferred, 1024 * 1024); // read 1 Mb at a time
+                long bytesRead = outputChannel.transferFrom(inputChannel, bytesTransferred, 1024 * 1024);
+                bytesTransferred +=  bytesRead; // read 1 Mb at a time
                 pb.stepTo(bytesTransferred);
+
+                if (bytesRead == 0) {
+                    long current = System.currentTimeMillis();
+                    if (initialZeroByteTime == -1) {
+                        initialZeroByteTime = current;
+                    } else if ((current - initialZeroByteTime) / 1000 > 5) { // after waiting 5 seconds, assume file download successful
+                        System.out.println("Maximum time reached");
+                        break;
+                    }
+                } else { // reset
+                    initialZeroByteTime = -1;
+                }
             }
         }
     }
 
+    /**
+     * Close the browser
+     */
     public void close() {
-        driver.close();
+        driver.quit();
     }
 }
