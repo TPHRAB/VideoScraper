@@ -6,7 +6,7 @@
 
 package download;
 
-import controller.AutoDownload;
+import controller.VideoScraper;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -186,7 +186,7 @@ public class DownloadManager {
         for (int i = first; i <= last && last < list.size(); i++) {
         	try {
 	            URL url = new URL(list.get(i));
-	            File out = new File(dir.getAbsoluteFile() + AutoDownload.DIRECTORY_SEPERATOR +
+	            File out = new File(dir.getAbsoluteFile() + VideoScraper.DIRECTORY_SEPERATOR +
 	            		getURLFileName(url));
 	            doDownloadSingleFile(url, out, 1, pW, requestProperties);
         	} catch (IOException e1) {

@@ -18,13 +18,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.dom4j/dom4j -->
-    <dependency>
-      <groupId>org.dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-      <version>2.1.1</version>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/jaxen/jaxen -->
     <dependency>
       <groupId>jaxen</groupId>
@@ -43,35 +36,36 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>3.11.0</version>
+      <version>3.141.59</version>
     </dependency>
 
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>25.0-jre</version>
-    </dependency>
-
-    <dependency>
-      <groupId>dom4jExtension</groupId>
-      <artifactId>dome4jExtension</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/dom4jExtension.jar</systemPath>
-    </dependency>
-
-    <dependency>
-      <groupId>progressbar</groupId>
+      <groupId>me.tongfei</groupId>
       <artifactId>progressbar</artifactId>
-      <version>1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/progressbar.jar</systemPath>
+      <version>0.9.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.json/json -->
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20200518</version>
     </dependency>
   </dependencies>
 
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
   </properties>
 
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

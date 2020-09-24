@@ -1,30 +1,39 @@
 package controller;
 
+// custom downloader
 import download.DownloadManager;
-import org.dom4j.Element;
+
+// selenium
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-import extensions.dom4j.Dom4jUtil;
+// command line progress bar
 import progressbar.ProgressBar;
 
+// ssl
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+// json
+import org.json.JSONObject;
+
+// utils
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.FileSystems;
 import java.net.URL;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class AutoDownload {
+public class VideoScraper {
 
     public static final String DIRECTORY_SEPERATOR = System.getProperty("os.name").
     		toLowerCase().contains("win") ? "\\" : "/";
@@ -58,84 +67,30 @@ public class AutoDownload {
         ctx.init(new KeyManager[0], new TrustManager[] {new DefaultTrustManager()}, new SecureRandom());
         SSLContext.setDefault(ctx);
 
-        org.dom4j.Document xml = Dom4jUtil.getDocument("websites.xml");
+        // load configuration
+        String json = Files.readString(FileSystems.getDefault().getPath("config.json"), StandardCharsets.UTF_8);
+		JSONObject config = new JSONObject(json);
 
         // get url and output path
         Scanner console = new Scanner(System.in);
-        System.out.print("Please input the video url: ");
+        System.out.print("Please paste in video url: ");
         String url = console.nextLine();
-        System.out.print("Pleae input the path for generating video(s): ");
-        String outputDirectory = console.nextLine();
-        if (outputDirectory.trim().isEmpty()) {
-        	String xpath = "/config/defaultPath[@seperator='" + DIRECTORY_SEPERATOR + "']";
-            System.out.println(xpath);
-        	outputDirectory = xml.selectSingleNode(xpath).getText();
-        }
-        File out = new File(outputDirectory);
-
-        String xpath = "/config/methods/host[@id='" + new URL(url).getHost() + "']";
-        Element host = (Element) xml.selectSingleNode(xpath);
-
-        if (host.attributeValue("method").equals("directMP4")) {
-        	directMP4(url, out, host);
-        } else if (host.attributeValue("method").equals("seleniumMP4")) {
-        	// be ready for ssl
-    		System.setProperty("javax.net.ssl.keyStorePassword", "123456");
-    		System.setProperty("webdriver.gecko.driver", "./geckodriver.exe");
-
-    		WebDriver browser = new FirefoxDriver();
-    		// set time interval to wait after loading a new page so that xpath could work fine
-    		browser.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-    		browser.get(url);
-    		// get video file
-    		String link = null;
-    		List<WebElement> target = browser.findElements(By.xpath("//iframe"));
-    		for (WebElement e : target) {
-    			if (e.getAttribute("src").contains("?videoid=")) {
-    				browser.switchTo().frame(e);
-    				WebElement realTarget = browser.findElement(By.tagName("source"));
-    				link = realTarget.getAttribute("src");
-    				break;
-    			}
-    		}
-    		browser.close();
-    		File result = new File(out.getAbsolutePath() + DIRECTORY_SEPERATOR + DownloadManager.
-    				getURLTitle(url) + ".mp4");
-    		ProgressBar pb = new ProgressBar("Download", 11, "Thread", 1, "10");
-    		pb.start();
-    		DownloadManager.doDownloadSingleFile(new URL(link), result, 10, pb.getPipedWriter(),
-    				new HashMap<String, String>());
-    		pb.join();
-        } else {
-        	System.out.println("Not supported website!");
+        System.out.print("Please input the path for generating video(s): ");
+        String outputPath = console.nextLine();
+        if (outputPath.trim().isEmpty()) { // when user didn't input a directory, use default output directory
+        	outputPath = config.getString("defaultPath");
         }
 
-        // write history
-        boolean recordHistory = ((Element) xml.selectSingleNode("/config/history"))
-                .attributeValue("record")
-                .equals("true");
-        if (recordHistory) {
-            String path = ((Element) xml.selectSingleNode("/config/history")).
-            		attributeValue("path");
-            File history = new File(path);
-            if (!history.exists()) {
-                history.createNewFile();
-            }
-            RandomAccessFile r = new RandomAccessFile(path, "rwd");
-            r.seek(history.length());
-            r.writeChars(new Date() + "    " + url + "    " + DownloadManager.
-            		getURLTitle(url) + "\r\n");
-            r.close();
-        }
+        // examine which method to use based on the website
+		WebSites websites = new WebSites(outputPath);
+        String domainName = new URL(url).getHost();
+       	if (domainName.equals("www.youtube.com")) {
+			websites.youtube(url);
+		}
+
+		// destruct
+//		websites.close();
         console.close();
-
-        for (File f : new File(".").listFiles()) {
-        	String regex = ".*\\.m3u8";
-        	if (f.getName().matches(regex)) {
-        		f.delete();
-        	}
-        }
-
         System.out.println("Finish...");
     }
 
@@ -184,7 +139,7 @@ public class AutoDownload {
         DownloadManager.downloadTSFileList(list, dir, 10, new HashMap<String, String>());
     }
 
-    public static void directMP4(String url, File out, Element host) throws Exception {
+    public static void directMP4(String url, File out) throws Exception {
     	if (DIRECTORY_SEPERATOR.equals("/")) {
     		System.setProperty("webdriver.gecko.driver", "./geckodriver_linux");
     	} else {
@@ -222,7 +177,7 @@ public class AutoDownload {
             	command.add("./ffmpeg");
             	execution = true;
             } else {
-            	System.out.println("Not supported operating system! Please do the convertion"
+            	System.out.println("Not supported operating system! Please do the conversion"
             			+ " by yourself!");
             }
 
@@ -261,14 +216,14 @@ public class AutoDownload {
 		}
 	}
 
-	public static void videoCombine(Scanner console, String url, File dir, Element host)
+	public static void videoCombine(Scanner console, String url, File dir, JSONObject host)
 			throws Exception {
         System.out.print("Please input the path for combination: ");
         String path = console.nextLine();
         path = path + DIRECTORY_SEPERATOR + DownloadManager.getURLTitle(url) + ".ts";
         File result = new File(path);
         copy.TestThread.waitThreads(
-                copy.TestThread.doCombine(dir.listFiles(), result));
+        		copy.TestThread.doCombine(dir.listFiles(), result));
 
         if (dir.getName().equals("raw")) {
             for (File f : dir.listFiles()) {
@@ -277,9 +232,9 @@ public class AutoDownload {
             dir.delete();
         }
 
-        String convert = host.attributeValue("autoConvert");
-        if (convert != null && convert.equals("true")) {
-            if (videoConvert(path)) result.delete();
+		boolean autoConvert = host == null ? true : host.getBoolean("autoConvert");
+		if (autoConvert && videoConvert(path)) { // if autoConvert is not specified or autoConvert is true
+            result.delete();
         }
     }
 }
