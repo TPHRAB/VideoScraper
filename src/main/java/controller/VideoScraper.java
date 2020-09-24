@@ -75,7 +75,7 @@ public class VideoScraper {
         Scanner console = new Scanner(System.in);
         System.out.print("Please paste in video url: ");
         String url = console.nextLine();
-        System.out.print("Please input the path for generating video(s): ");
+        System.out.print("Please input the directory path for generating the video: ");
         String outputPath = console.nextLine();
         if (outputPath.trim().isEmpty()) { // when user didn't input a directory, use default output directory
         	outputPath = config.getString("defaultPath");
